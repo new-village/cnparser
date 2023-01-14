@@ -1,14 +1,26 @@
 # cnparser
 **cnparser** is a python library for loading and enrichment [Corporate Number Publication Site](https://www.houjin-bangou.nta.go.jp/en/) data that is provided from National Tax Agency Japan. cnparser only support to parse latest data now.   
   
-### Dependencies
+### Installation  
 ----------------------
-- [requests](https://docs.python-requests.org/en/latest/)  
-- [bs4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#)  
+cnparser is available on pip installation.
+```
+$ python -m pip install cnparser
+```
   
+#### GitHub Install
+Installing the latest version from GitHub:  
+```
+$ git clone https://github.com/new-village/cnparser
+$ cd cnparser
+$ python setup.py install
+```
+    
 ### Usage
 ----------------------
-#### Basic information (基本3情報)
+Many properties are available once the cnparser object is created.  
+  
+#### Collect basic information (基本3情報)
 ```python
 >>> import cnparser
 >>> cndata = cnparser.bulk_load("Shimane")
