@@ -1,5 +1,6 @@
 '''load.py
 '''
+import csv
 import io
 import re
 import zipfile
@@ -42,9 +43,9 @@ class ZipLoader():
         """
         # Download Corporate Number ZIP & Uncompression
         contents = self._download_zip(file_id)
-        csv = self._uncompress_file(contents)
-        # TODO: Parse text file to Dict format
-        self.show = csv
+        lines = self._uncompress_file(contents)
+        # Convert string objects to List/Dict object
+        self.show = self._convert_str_2_csv(lines)
         return self
 
     def _load_token(self, url, key) -> str:
@@ -86,3 +87,14 @@ class ZipLoader():
                 txt = zip_object.open(file_name).read()
                 lines = txt.decode().splitlines()
         return lines
+
+    def _convert_str_2_csv(self, lines:list) -> list:
+        """ Convert comma separated format string to dict nested list object.
+        :param lines: List of comma separated string
+        :return: List object
+        """
+        # Load header definition
+        header = load_config("header")
+        # Read comma separated format string
+        reader = csv.DictReader(lines, fieldnames=header)
+        return list(reader)

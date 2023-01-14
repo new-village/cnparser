@@ -8,7 +8,7 @@ To load [netkeiba.com](https://www.netkeiba.com/) data and parse to dictionay fi
 #### Basic information (基本3情報)
 ```python
 >>> import cnparser
->>> cndata = cnparser.load("tottori")
->>> cndata.info
-[{'corp_number': '1000013050238', 'corp_name': '鳥取簡易裁判所', 'corp_kana': 'トットリカンイサイバンショ', ... }]
+>>> cndata = cnparser.bulk_load("Shimane")
+>>> cndata.show
+[{'sequence_number': '1', 'corporate_number': '1000013050246', ... }]
 ```
