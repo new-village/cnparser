@@ -7,6 +7,7 @@ import zipfile
 
 import requests
 from bs4 import BeautifulSoup
+from normalize_japanese_addresses import normalize
 
 from cnparser.utility import load_config
 
@@ -17,9 +18,17 @@ def bulk_load(prefecture="All"):
     :return: :class:`Response <Response>` object
     """
     loader = ZipLoader()
-    return loader.bulk_load(prefecture_2_file_id(prefecture))
+    return loader.bulk_load(_prefecture_2_file_id(prefecture))
 
-def prefecture_2_file_id(prefecture) -> str:
+def bulk_enrich(zip_loader):
+    """ Enrich Corporate Number Publication Site data.
+    :param zip_loader: :class:`ZipLoader <ZipLoader>` object
+    :return: :class:`ZipLoader <ZipLoader>` object
+    """
+    zip_loader.show = _normalize_address(zip_loader.show)
+    return zip_loader
+
+def _prefecture_2_file_id(prefecture) -> str:
     """ Convert prefecture name to the site defined file id.
     :param prefecture: STRING of prefecture name such as ALL, tokyo or tottori
     :return: Str object
@@ -31,6 +40,14 @@ def prefecture_2_file_id(prefecture) -> str:
         return file_list[prefecture.capitalize()]
     except KeyError as exp:
         raise SystemExit(f"Unexpected Key Value: {prefecture}") from exp
+
+def _normalize_address(lines:list) -> list:
+    """ Normalize address data
+    """
+    for corp in lines:
+        addr = str(corp['prefecture_name']) + str(corp['city_name']) + str(corp['street_number'])
+        corp.update(normalize(addr))
+    return lines
 
 class ZipLoader():
     """ ZipLoader

@@ -13,7 +13,7 @@ setup(
     description='cnparser is a parser library of Corporate Number Publication Site data.',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=['requests', 'bs4'],
+    install_requires=['requests', 'bs4', 'normalize-japanese-addresses'],
     packages=find_packages(),
     package_data={'': ['config/*.json']},
 )
