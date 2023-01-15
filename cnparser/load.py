@@ -4,9 +4,12 @@ import csv
 import io
 import re
 import zipfile
+
 import requests
 from bs4 import BeautifulSoup
+
 from cnparser.utility import load_config
+
 
 def bulk_load(prefecture="All"):
     """ Load Corporate Number Publication Site data.
@@ -75,7 +78,7 @@ class ZipLoader():
         # Response Status Confirmation
         if res.status_code not in [200]:
             # HTTP Response is not 200 (Normal)
-            raise SystemExit('Request to ' + self.url + ' has been failure: ' + str(res.status_code))
+            raise SystemExit('Request to ' + self.url + ' has been failed: ' + str(res.status_code))
         return res.content
 
     def _uncompress_file(self, content) -> list:
