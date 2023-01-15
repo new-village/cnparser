@@ -46,6 +46,8 @@ class ZipLoader():
         lines = self._uncompress_file(contents)
         # Convert string objects to List/Dict object
         self.show = self._convert_str_2_csv(lines)
+        # Convert blank records to None
+        self.show = self._delete_blank(self.show)
         return self
 
     def _load_token(self, url, key) -> str:
@@ -98,3 +100,14 @@ class ZipLoader():
         # Read comma separated format string
         reader = csv.DictReader(lines, fieldnames=header)
         return list(reader)
+
+    def _delete_blank(self, lines:list) -> list:
+        """ Convert blank field ('') to None object
+        :param lines: List of dict data
+        :return: List object
+        """
+        for rec in lines:
+            for key, val in rec.items():
+                rec[key] = None if val == '' else val
+
+        return lines
