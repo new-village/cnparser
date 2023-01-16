@@ -13,6 +13,7 @@ class TestLoader(unittest.TestCase):
         cls.success_case = cnparser.bulk_load("Shimane")
         # Enrich success_case
         enriched = copy.deepcopy(cls.success_case)
+        enriched.show = enriched.show[:10]
         cls.enriched = cnparser.bulk_enrich(enriched)
 
     def test_success_case_count(self):
@@ -91,7 +92,13 @@ class TestLoader(unittest.TestCase):
             'en_address_outside': None,
             'furigana': 'カワモトカンイサイバンショ',
             'hihyoji': '0',
-            'debug': '島根県邑智郡川本町大字川本３４０'
+            'pref': '島根県', 
+            'city': '邑智郡川本町', 
+            'town': '大字川本', 
+            'addr': '340', 
+            'lat': 34.978982, 
+            'lng': 132.525163, 
+            'level': 3
         }
         self.assertDictEqual(self.enriched.show[0], expect)
 
