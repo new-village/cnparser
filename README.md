@@ -34,5 +34,5 @@ Many properties are available once the cnparser object is created.
 >>> import cnparser
 >>> cndata = cnparser.bulk_enrich(cndata)
 >>> cndata.show
-[{'sequence_number': '1', 'corporate_number': '1000013050246', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
+[{'sequence_number': '1', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
 ```
