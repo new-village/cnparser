@@ -7,6 +7,7 @@ import zipfile
 
 import requests
 from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
 from normalize_japanese_addresses import normalize
 
 from cnparser.utility import load_config
@@ -44,9 +45,13 @@ def _prefecture_2_file_id(prefecture) -> str:
 def _normalize_address(lines:list) -> list:
     """ Normalize address data
     """
-    for corp in lines:
+    def normalize_and_update(corp):
         addr = str(corp['prefecture_name']) + str(corp['city_name']) + str(corp['street_number'])
         corp.update(normalize(addr))
+        return corp
+
+    with ThreadPoolExecutor() as executor:
+        lines = list(executor.map(normalize_and_update, lines))
     return lines
 
 class ZipLoader():
