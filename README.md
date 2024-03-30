@@ -44,3 +44,10 @@ Many properties are available once the cnparser object is created.
 >>> print(enriched)
 [{'sequence_number': '1', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
 ```
+
+#### Enrich information to CSV file  
+You can export enriched data to CSV file directry by `export_file` option with file name.
+```python
+>>> import cnparser
+>>> enriched = cnparser.bulk_enrich(cndata, export_file="path/to/export/data.csv")
+```

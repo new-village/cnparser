@@ -25,7 +25,7 @@ def bulk_load(prefecture="All"):
     loader = ZipLoader()
     return loader.bulk_load(_prefecture_2_file_id(prefecture))
 
-def bulk_enrich(data):
+def bulk_enrich(data, export_file=None):
     """ 
     Enriches the data from the Corporate Number Publication Site.
     Accepts either a path to a CSV file or a list of data, and returns a list of data with normalized address information.
@@ -37,7 +37,15 @@ def bulk_enrich(data):
         data = _read_csv_file(data)
     elif not isinstance(data, list):
         raise ValueError("Invalid argument type. Argument must be a .csv file path or a list.")
-    return _normalize_address(data)
+
+    normalized_data = _normalize_address(data)
+    if export_file:
+        with open(export_file, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=normalized_data[0].keys())
+            writer.writeheader()
+            writer.writerows(normalized_data)
+
+    return normalized_data
 
 def _read_csv_file(file_path: str) -> list:
     """ Read a CSV file and return a list of dictionaries """
