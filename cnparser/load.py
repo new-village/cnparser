@@ -42,7 +42,7 @@ def bulk_enrich(data):
 def _read_csv_file(file_path: str) -> list:
     """ Read a CSV file and return a list of dictionaries """
     data_list = []
-    headers = _read_json_file()
+    headers = load_config("header")
     with open(file_path, 'r', encoding='utf-8') as file:
         csv_reader = csv.reader(file)
         cnt = 1
@@ -54,12 +54,6 @@ def _read_csv_file(file_path: str) -> list:
                 continue  # この行をスキップ
             data_list.append({headers[i]: row[i] for i in range(len(headers))})
     return data_list
-
-def _read_json_file() -> dict:
-    """ Read a JSON file """
-    file_path = 'cnparser/config/header.json'
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return json.load(file)
 
 def _prefecture_2_file_id(prefecture) -> str:
     """ Convert prefecture name to the site defined file id.
