@@ -13,13 +13,12 @@ class TestLoader(unittest.TestCase):
         cls.success_case = cnparser.bulk_load("Shimane")
         # Enrich success_case
         enriched = copy.deepcopy(cls.success_case)
-        enriched.show = enriched.show[:10]
-        cls.enriched = cnparser.bulk_enrich(enriched)
+        cls.enriched = cnparser.bulk_enrich(enriched[:200])
 
     def test_success_case_count(self):
         """ testing success case counts
         """
-        self.assertGreater(len(self.success_case.show), 10000)
+        self.assertGreater(len(self.success_case), 10000)
 
     def test_success_case_parse(self):
         """ testing success case parse
@@ -56,7 +55,7 @@ class TestLoader(unittest.TestCase):
             'furigana': 'カワモトカンイサイバンショ',
             'hihyoji': '0'
         }
-        self.assertDictEqual(self.success_case.show[0], expect)
+        self.assertDictEqual(self.success_case[0], expect)
 
     def test_enrichment(self):
         """ testing enrichment
@@ -100,7 +99,13 @@ class TestLoader(unittest.TestCase):
             'lng': 132.525163, 
             'level': 3
         }
-        self.assertDictEqual(self.enriched.show[0], expect)
+        self.assertDictEqual(self.enriched[0], expect)
+
+    def test_bulk_enrich_count(self):
+        """Load CSV into bulk_enrich and test if there are 1000 records
+        """
+        result = cnparser.bulk_enrich("test/data/31_tottori_test_20240329.csv")
+        self.assertEqual(len(result), 10)
 
 if __name__ == '__main__':
     unittest.main()

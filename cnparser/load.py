@@ -2,12 +2,16 @@
 '''
 import csv
 import io
+import os
 import re
+import json
 import zipfile
+import datetime
 
 import requests
 from bs4 import BeautifulSoup
-from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from concurrent.futures import ProcessPoolExecutor
 from normalize_japanese_addresses import normalize
 
 from cnparser.utility import load_config
@@ -16,18 +20,46 @@ from cnparser.utility import load_config
 def bulk_load(prefecture="All"):
     """ Load Corporate Number Publication Site data.
     :param prefecture: prefecture name such as ALL, tokyo, tottori and shizuoka
-    :return: :class:`Response <Response>` object
+    :return: :class:`List <list>` object
     """
     loader = ZipLoader()
     return loader.bulk_load(_prefecture_2_file_id(prefecture))
 
-def bulk_enrich(zip_loader):
-    """ Enrich Corporate Number Publication Site data.
-    :param zip_loader: :class:`ZipLoader <ZipLoader>` object
-    :return: :class:`ZipLoader <ZipLoader>` object
+def bulk_enrich(data):
+    """ 
+    Enriches the data from the Corporate Number Publication Site.
+    Accepts either a path to a CSV file or a list of data, and returns a list of data with normalized address information.
+
+    :param data: Path to a CSV file or a list of corporate data
+    :return: A list of corporate data with normalized address information
     """
-    zip_loader.show = _normalize_address(zip_loader.show)
-    return zip_loader
+    if isinstance(data, str) and ".csv" in data:
+        data = _read_csv_file(data)
+    elif not isinstance(data, list):
+        raise ValueError("Invalid argument type. Argument must be a .csv file path or a list.")
+    return _normalize_address(data)
+
+def _read_csv_file(file_path: str) -> list:
+    """ Read a CSV file and return a list of dictionaries """
+    data_list = []
+    headers = _read_json_file()
+    with open(file_path, 'r', encoding='utf-8') as file:
+        csv_reader = csv.reader(file)
+        cnt = 1
+        for row in csv_reader:
+            cnt = cnt + 1
+            # rowの長さがheadersの長さと一致するか確認
+            if len(row) != len(headers):
+                print(f"Warning: Row {cnt} skipped due to mismatched length. Expected {len(headers)}, got {len(row)}.")
+                continue  # この行をスキップ
+            data_list.append({headers[i]: row[i] for i in range(len(headers))})
+    return data_list
+
+def _read_json_file() -> dict:
+    """ Read a JSON file """
+    file_path = 'cnparser/config/header.json'
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return json.load(file)
 
 def _prefecture_2_file_id(prefecture) -> str:
     """ Convert prefecture name to the site defined file id.
@@ -42,16 +74,28 @@ def _prefecture_2_file_id(prefecture) -> str:
     except KeyError as exp:
         raise SystemExit(f"Unexpected Key Value: {prefecture}") from exp
 
-def _normalize_address(lines:list) -> list:
-    """ Normalize address data
-    """
-    def normalize_and_update(corp):
-        addr = str(corp['prefecture_name']) + str(corp['city_name']) + str(corp['street_number'])
-        corp.update(normalize(addr))
-        return corp
+def update_progress_and_normalize(corp, index, total_lines, progress_interval):
+    if index % progress_interval == 0:
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"{current_time} - Processing progress: {int((index / total_lines) * 100)}% complete")
+    addr = str(corp['prefecture_name']) + str(corp['city_name']) + str(corp['street_number'])
+    corp.update(normalize(addr))
+    return corp
 
-    with ThreadPoolExecutor() as executor:
-        lines = list(executor.map(normalize_and_update, lines))
+def _normalize_address(lines):
+    total_lines = len(lines)
+    print(f"Processing {total_lines} records.")
+    progress_interval = total_lines // 10
+
+    # functools.partialを使用して、追加の引数を設定
+    func = partial(update_progress_and_normalize, total_lines=total_lines, progress_interval=progress_interval)
+
+    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
+        # executor.mapに渡すために、funcを使用
+        lines = list(executor.map(func, lines, range(total_lines)))
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"{current_time} - Processing progress: 100% complete")
+    
     return lines
 
 class ZipLoader():
@@ -63,7 +107,7 @@ class ZipLoader():
         self.key = "jp.go.nta.houjin_bangou.framework.web.common.CNSFWTokenProcessor.request.token"
         self.payload = {self.key: self._load_token(self.url, self.key), "event": "download"}
 
-    def bulk_load(self, file_id):
+    def bulk_load(self, file_id) -> str:
         """ Load Corporate Number Publication Site data.
         """
         # Download Corporate Number ZIP & Uncompression
@@ -73,7 +117,7 @@ class ZipLoader():
         self.show = self._convert_str_2_csv(lines)
         # Convert blank records to None
         self.show = self._delete_blank(self.show)
-        return self
+        return self.show
 
     def _load_token(self, url, key) -> str:
         """ Load contents
@@ -105,14 +149,19 @@ class ZipLoader():
 
     def _uncompress_file(self, content) -> list:
         # Create Zip Object from response strings
-        zip_object = zipfile.ZipFile(io.BytesIO(content))
+        try:
+            zip_object = zipfile.ZipFile(io.BytesIO(content))
+        except zipfile.BadZipFile:
+            print("Failed to unzip content. The content may not be a valid zip file.")
+            raise
 
         # Uncompress ZIP files & union all files
         # if the Zip file has many text files, the script integrate files to single file.
+        lines = []
         for file_name in zip_object.namelist():
             if not re.search(r'.*\.asc', file_name):
                 txt = zip_object.open(file_name).read()
-                lines = txt.decode().splitlines()
+                lines += txt.decode().splitlines()
         return lines
 
     def _convert_str_2_csv(self, lines:list) -> list:
@@ -136,3 +185,4 @@ class ZipLoader():
                 rec[key] = None if val == '' else val
 
         return lines
+

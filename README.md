@@ -25,14 +25,22 @@ Many properties are available once the cnparser object is created.
 ```python
 >>> import cnparser
 >>> cndata = cnparser.bulk_load("Shimane")
->>> cndata.show
+>>> print(cndata)
 [{'sequence_number': '1', 'corporate_number': '1000013050246', ...,  'hihyoji': '0'}, {...}]
 ```
   
-#### Enrich information
+#### Enrich information from `bulk_load` result
 ```python
 >>> import cnparser
->>> cndata = cnparser.bulk_enrich(cndata)
->>> cndata.show
+>>> enriched = cnparser.bulk_enrich(cndata)
+>>> print(enriched)
+[{'sequence_number': '1', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
+```
+
+#### Enrich information from downloaded CSV File
+```python
+>>> import cnparser
+>>> enriched = cnparser.bulk_enrich("path/to/data.csv")
+>>> print(enriched)
 [{'sequence_number': '1', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
 ```
