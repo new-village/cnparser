@@ -14,10 +14,8 @@ from functools import partial
 from concurrent.futures import ProcessPoolExecutor
 from normalize_japanese_addresses import normalize
 
-import cnparser
-from cnparser.utility import load_config
+from cnparser.utility import load_config, load_api
 
-api_location = 'file://' + os.path.dirname(cnparser.__file__) + '/config/api/ja'
 
 def bulk_load(prefecture="All"):
     """ Load Corporate Number Publication Site data.
@@ -83,7 +81,7 @@ def update_progress_and_normalize(corp, index, total_lines, progress_interval):
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"{current_time} - Processing progress: {int((index / total_lines) * 100)}% complete")
     addr = str(corp['prefecture_name']) + str(corp['city_name']) + str(corp['street_number'])
-    corp.update(normalize(addr, endpoint=api_location))
+    corp.update(normalize(addr, endpoint=load_api()))
     return corp
 
 def _normalize_address(lines):
