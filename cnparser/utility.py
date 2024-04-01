@@ -5,6 +5,7 @@ import json
 import os
 
 import cnparser
+import pkg_resources
 
 
 def load_config(data_type:str) -> str:
@@ -21,8 +22,9 @@ def load_config(data_type:str) -> str:
         raise SystemExit(f'Config file not found: {exc}') from exc
 
 def load_api() -> str:
-    is_file = os.path.dirname(cnparser.__file__) + '/config/api/ja.json'
-    if is_file:
-        return 'file://' + os.path.dirname(cnparser.__file__) + '/config/api/ja'
+    resource_path = 'config/api/ja.json'  # パッケージ内のリソースへのパス
+    if pkg_resources.resource_exists(__name__, resource_path):
+        file_path = pkg_resources.resource_filename(__name__, resource_path)
+        return 'file://' + file_path.replace('.json', '')
     else:
-        return 'file://' + os.path.dirname(cnparser.__file__) + '/cnparser/config/api/ja'
+        raise FileNotFoundError(f"No such file or directory: '{resource_path}'")
