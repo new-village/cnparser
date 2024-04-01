@@ -14,9 +14,10 @@ from functools import partial
 from concurrent.futures import ProcessPoolExecutor
 from normalize_japanese_addresses import normalize
 
+import cnparser
 from cnparser.utility import load_config
 
-api_location = 'file://' + os.path.dirname(__file__) + '/config/api/ja'
+api_location = 'file://' + os.path.dirname(cnparser.__file__) + '/config/api/ja'
 
 def bulk_load(prefecture="All"):
     """ Load Corporate Number Publication Site data.
