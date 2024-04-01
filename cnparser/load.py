@@ -25,12 +25,14 @@ def bulk_load(prefecture="All"):
     loader = ZipLoader()
     return loader.bulk_load(_prefecture_2_file_id(prefecture))
 
-def bulk_enrich(data, export_file=None):
+def bulk_enrich(data, export_file=None, api_path=None):
     """ 
     Enriches the data from the Corporate Number Publication Site.
     Accepts either a path to a CSV file or a list of data, and returns a list of data with normalized address information.
 
     :param data: Path to a CSV file or a list of corporate data
+    :param export_file: Optional; if provided, the enriched data will be written to this file
+    :param api_path: Optional; if provided, it will be used as the endpoint for the normalize function
     :return: A list of corporate data with normalized address information
     """
     if isinstance(data, str) and ".csv" in data:
@@ -38,7 +40,7 @@ def bulk_enrich(data, export_file=None):
     elif not isinstance(data, list):
         raise ValueError("Invalid argument type. Argument must be a .csv file path or a list.")
 
-    normalized_data = _normalize_address(data)
+    normalized_data = _normalize_address(data, api_path=api_path)  # api_path を _normalize_address に渡す
     if export_file:
         with open(export_file, 'w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=normalized_data[0].keys())
@@ -76,21 +78,27 @@ def _prefecture_2_file_id(prefecture) -> str:
     except KeyError as exp:
         raise SystemExit(f"Unexpected Key Value: {prefecture}") from exp
 
-def update_progress_and_normalize(corp, index, total_lines, progress_interval):
+def update_progress_and_normalize(corp, index, total_lines, progress_interval, api_path=None):  # api_path 引数を追加
     if index % progress_interval == 0:
         current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"{current_time} - Processing progress: {int((index / total_lines) * 100)}% complete")
     addr = str(corp['prefecture_name']) + str(corp['city_name']) + str(corp['street_number'])
-    corp.update(normalize(addr, endpoint=load_api()))
+    if api_path:
+        corp.update(normalize(addr, endpoint=api_path))  # api_path がある場合、endpoint として渡す
+    else:
+        corp.update(normalize(addr))
     return corp
 
-def _normalize_address(lines):
+def _normalize_address(lines, api_path=None):  # api_path 引数を追加
     total_lines = len(lines)
     print(f"Processing {total_lines} records.")
     progress_interval = total_lines // 10
 
     # functools.partialを使用して、追加の引数を設定
-    func = partial(update_progress_and_normalize, total_lines=total_lines, progress_interval=progress_interval)
+    if api_path:
+        func = partial(update_progress_and_normalize, total_lines=total_lines, progress_interval=progress_interval, api_path=api_path)
+    else:
+        func = partial(update_progress_and_normalize, total_lines=total_lines, progress_interval=progress_interval)
 
     with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
         # executor.mapに渡すために、funcを使用

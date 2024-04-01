@@ -1,0 +1,35 @@
+name: Deploy Staging API
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - "!*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: mkdir data || true
+      - run: npm install
+      - name: Test
+        run: npm test
+  deploy-staging-api:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: mkdir data || true
+      - run: npm install
+      - run: NODE_OPTIONS="--max-old-space-size=4096" node bin/build.js
+      - run: node bin/build-api.js
+      - name: "Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      - name: S3 sync
+        working-directory: api
+        run: aws s3 sync . s3://${{ secrets.AWS_BUCKET_NAME }}/develop --delete --cache-control "public, max-age=604800, immutable"

@@ -51,3 +51,15 @@ You can export enriched data to CSV file directry by `export_file` option with f
 >>> import cnparser
 >>> enriched = cnparser.bulk_enrich(cndata, export_file="path/to/export/data.csv")
 ```
+
+#### Enrich information to CSV file with downloaded api
+If you enrich massive data, You can use downloaded api.
+```
+$ cd /home/<USER>/
+$ curl -sL https://github.com/geolonia/japanese-addresses/archive/refs/heads/master.tar.gz | tar xvfz -
+```
+  
+```python
+>>> import cnparser
+>>> enriched = cnparser.bulk_enrich(cndata, api_path="file:///home/<USER>/japanese-addresses-master/api/ja")
+```
