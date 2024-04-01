@@ -21,5 +21,8 @@ def load_config(data_type:str) -> str:
         raise SystemExit(f'Config file not found: {exc}') from exc
 
 def load_api() -> str:
-    loc = 'file://' + os.path.dirname(cnparser.__file__) + '/config/api/ja'
-    return loc
+    is_file = os.path.dirname(cnparser.__file__) + '/config/api/ja.json'
+    if is_file:
+        return 'file://' + os.path.dirname(cnparser.__file__) + '/config/api/ja'
+    else:
+        return 'file://' + os.path.dirname(cnparser.__file__) + '/cnparser/config/api/ja'
