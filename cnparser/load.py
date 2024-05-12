@@ -25,6 +25,7 @@ def bulk_load(prefecture="All"):
     loader = ZipLoader()
     return loader.bulk_load(_prefecture_2_file_id(prefecture))
 
+
 def bulk_enrich(data, export_file=None, api_path=None):
     """ 
     Enriches the data from the Corporate Number Publication Site.
@@ -36,7 +37,7 @@ def bulk_enrich(data, export_file=None, api_path=None):
     :return: A list of corporate data with normalized address information
     """
     if isinstance(data, str) and ".csv" in data:
-        data = _read_csv_file(data)
+        data = read_csv_file(data)
     elif not isinstance(data, list):
         raise ValueError("Invalid argument type. Argument must be a .csv file path or a list.")
 
@@ -49,8 +50,8 @@ def bulk_enrich(data, export_file=None, api_path=None):
 
     return normalized_data
 
-def _read_csv_file(file_path: str) -> list:
-    """ Read a CSV file and return a list of dictionaries """
+def read_csv_file(file_path: str) -> list:
+    """ Reads a CSV file and returns a list of dictionaries. """
     data_list = []
     headers = load_config("header")
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -58,10 +59,10 @@ def _read_csv_file(file_path: str) -> list:
         cnt = 1
         for row in csv_reader:
             cnt = cnt + 1
-            # rowの長さがheadersの長さと一致するか確認
+            # Check if the length of the row matches the length of headers
             if len(row) != len(headers):
                 print(f"Warning: Row {cnt} skipped due to mismatched length. Expected {len(headers)}, got {len(row)}.")
-                continue  # この行をスキップ
+                continue  # Skip this row
             data_list.append({headers[i]: row[i] for i in range(len(headers))})
     return data_list
 

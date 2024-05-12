@@ -101,10 +101,10 @@ class TestLoader(unittest.TestCase):
         }
         self.assertDictEqual(self.enriched[0], expect)
 
-    def test_bulk_enrich_count(self):
+    def test_read_csv_file(self):
         """Load CSV into bulk_enrich and test if there are 1000 records
         """
-        result = cnparser.bulk_enrich("test/data/31_tottori_test_20240329.csv")
+        result = cnparser.read_csv_file("test/data/31_tottori_test_20240329.csv")
         self.assertEqual(len(result), 10)
 
 if __name__ == '__main__':
