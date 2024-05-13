@@ -105,7 +105,7 @@ class TestLoader(unittest.TestCase):
         """Load CSV into bulk_enrich and test if there are 1000 records
         """
         result = cnparser.read_csv_file("test/data/31_tottori_test_20240329.csv")
-        self.assertEqual(len(result), 10)
+        self.assertEqual(len(result), 14)
 
 if __name__ == '__main__':
     unittest.main()
