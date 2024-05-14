@@ -37,6 +37,17 @@ If you have an unzipped basic information (基本3情報), you can load file thi
 >>> print(cndata)
 [{'sequence_number': '1', 'corporate_number': '1000013050246', ...,  'hihyoji': '0'}, {...}]
 ```
+
+### `enrich_kana` function
+The `enrich_kana` function takes a list of corporate information and generates Kana (furigana) for each company name, returning the results as a list. This function processes through multiple steps including normalization of the company name, removal of corporate form suffixes, and conversion to Katakana.
+
+```python
+>>> import cnparser
+>>> enriched = cnparser.enrich_kana(cndata)
+>>> print(enriched)
+[{'sequence_number': '1', 'name': '山田商事株式会社', ...,  'e_furigana': 'ヤマダショウジ'}, {...}]
+```
+
   
 ### Enrich information from `bulk_load` result
 ```python
