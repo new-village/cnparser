@@ -7,14 +7,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='cnparser',
-    version='1.4.10',
+    version='1.4.11',
     author='new-village',
     url='https://github.com/new-village/cnparser',
     description='cnparser is a parser library of Corporate Number Publication Site data.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     license = 'GPLv3+',
-    install_requires=['requests', 'bs4', 'pykakasi', 'kanjize==1.5.0', 'normalize-japanese-addresses==0.0.9'],
+    install_requires=['requests', 'bs4', 'pykakasi==2.2.1', 'kanjize==1.5.0', 'normalize-japanese-addresses==0.0.9'],
     packages=find_packages(),
     package_data={'': ['config/*.json']},
 )
