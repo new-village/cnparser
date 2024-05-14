@@ -67,8 +67,16 @@ If you enrich massive data, You can use downloaded api.
 $ cd /home/<USER>/
 $ curl -sL https://github.com/geolonia/japanese-addresses/archive/refs/heads/master.tar.gz | tar xvfz -
 ```
-  
+
 ```python
 >>> import cnparser
 >>> enriched = cnparser.bulk_enrich(cndata, api_path="file:///home/<USER>/japanese-addresses-master/api/ja")
+```
+
+## Tools
+### import_dict.py: Bilingual Emacspeak Project (BEP) Dictionary Import Tool
+This tool imports the [BEP dictionary](https://fastapi.metacpan.org/source/MASH/Lingua-JA-Yomi-0.01/lib/Lingua/JA) and generates a dictionary file for use with cnparser. It processes the bilingual mappings from English to Kana, ensuring that cnparser can accurately handle and transform data involving these language elements.
+```
+$ cd /home/<USER>/analysis
+$ python enrich.py <FILE_PATH>
 ```
