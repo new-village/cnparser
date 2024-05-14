@@ -14,7 +14,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license = 'GPLv3+',
-    install_requires=['requests', 'bs4', 'kanjize==1.5.0', 'normalize-japanese-addresses==0.0.9'],
+    install_requires=['requests', 'bs4', 'kanjize==1.5.0', 'normalize-japanese-addresses==0.0.9', 'pykakasi'],
     packages=find_packages(),
     package_data={'': ['config/*.json']},
 )
