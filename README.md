@@ -18,70 +18,21 @@ $ python setup.py install
 ```
     
 ## Usage
-----------------------
-Many properties are available once the cnparser object is created.  
-  
-### Collect basic information (基本3情報)
-```python
+This section demonstrates how to use this library to load and process data from the National Tax Agency's [Corporate Number Publication Site](https://www.houjin-bangou.nta.go.jp/).
+
+### Direct Data Loading
+To load data for a specific prefecture, use the `load` function. By passing the prefecture name as an argument, you can obtain a DataFrame containing data for that prefecture.
+To execute the `load` function without specifying any arguments, data for all prefectures across Japan will be loaded. If you wish to load data for a specific prefecture, you must specify the prefecture name in Roman characters ([list of the supported prefecture](https://github.com/new-village/cnparser/blob/main/cnparser/config/file_id.json)) like below: 
+```
 >>> import cnparser
->>> cndata = cnparser.bulk_load("Shimane")
->>> print(cndata)
-[{'sequence_number': '1', 'corporate_number': '1000013050246', ...,  'hihyoji': '0'}, {...}]
+>>> df = cnparser.load("Shimane")
 ```
 
-### Import basic information (基本3情報)
-If you have an unzipped basic information (基本3情報), you can load file this library.
-```python
+### CSV Data Loading
+If you already have a downloaded CSV file, use the `read_csv` function. By passing the file path as an argument, you can obtain a DataFrame with headers from the CSV data.
+```
 >>> import cnparser
->>> cndata = cnparser.read_csv_file("path/to/data.csv")
->>> print(cndata)
-[{'sequence_number': '1', 'corporate_number': '1000013050246', ...,  'hihyoji': '0'}, {...}]
-```
-
-### `enrich_kana` function
-The `enrich_kana` function takes a list of corporate information and generates Kana (furigana) for each company name, returning the results as a list. This function processes through multiple steps including normalization of the company name, removal of corporate form suffixes, and conversion to Katakana.
-
-```python
->>> import cnparser
->>> enriched = cnparser.enrich_kana(cndata)
->>> print(enriched)
-[{'sequence_number': '1', 'name': '山田商事株式会社', ...,  'e_furigana': 'ヤマダショウジ'}, {...}]
-```
-
-  
-### Enrich information from `bulk_load` result
-```python
->>> import cnparser
->>> enriched = cnparser.bulk_enrich(cndata)
->>> print(enriched)
-[{'sequence_number': '1', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
-```
-
-### Enrich information from downloaded CSV File
-```python
->>> import cnparser
->>> enriched = cnparser.bulk_enrich("path/to/data.csv")
->>> print(enriched)
-[{'sequence_number': '1', ..., 'lat': 34.978982, 'lng': 132.525163, 'level': 3}, {...}]
-```
-
-### Enrich information to CSV file  
-You can export enriched data to CSV file directry by `export_file` option with file name.
-```python
->>> import cnparser
->>> enriched = cnparser.bulk_enrich(cndata, export_file="path/to/export/data.csv")
-```
-
-### Enrich information to CSV file with downloaded api
-If you enrich massive data, You can use downloaded api.
-```
-$ cd /home/<USER>/
-$ curl -sL https://github.com/geolonia/japanese-addresses/archive/refs/heads/master.tar.gz | tar xvfz -
-```
-
-```python
->>> import cnparser
->>> enriched = cnparser.bulk_enrich(cndata, api_path="file:///home/<USER>/japanese-addresses-master/api/ja")
+>>> df = cnparser.read_csv("path/to/data.csv")
 ```
 
 ## Tools
