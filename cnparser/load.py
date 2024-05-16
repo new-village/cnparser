@@ -6,13 +6,12 @@ import zipfile
 
 import requests
 import pandas as pd
-from pandas.core.frame import DataFrame
 from io import StringIO
 from bs4 import BeautifulSoup
 
 from cnparser.utility import load_config
 
-def load(prefecture="All") -> DataFrame:
+def load(prefecture="All") -> pd.DataFrame:
     """Loads data for a specified prefecture.
 
     Args:
@@ -24,7 +23,7 @@ def load(prefecture="All") -> DataFrame:
     loader = ZipLoader()
     return loader.zip_load(_prefecture_2_file_id(prefecture))
 
-def read_csv(file_path: str) -> DataFrame:
+def read_csv(file_path: str) -> pd.DataFrame:
     """Reads a CSV file from a specified path.
 
     Args:
@@ -33,8 +32,8 @@ def read_csv(file_path: str) -> DataFrame:
     Returns:
         DataFrame: A DataFrame containing the CSV data.
     """
-    headers = load_config("header")
-    return pd.read_csv(file_path, encoding='utf-8', names=headers)
+    header = load_config("header")
+    return pd.read_csv(file_path, encoding='utf-8', header=None, names=header, dtype='object')
 
 def _prefecture_2_file_id(prefecture) -> str:
     """Converts prefecture name to a file ID using configuration.
@@ -61,7 +60,7 @@ class ZipLoader():
         self.key = "jp.go.nta.houjin_bangou.framework.web.common.CNSFWTokenProcessor.request.token"
         self.payload = {self.key: self._load_token(self.url, self.key), "event": "download"}
 
-    def zip_load(self, file_id) -> DataFrame:
+    def zip_load(self, file_id) -> pd.DataFrame:
         """Loads and processes a zip file from the server using a file ID.
 
         Args:
@@ -141,7 +140,7 @@ class ZipLoader():
                 txt = zip_object.open(file_name).read()
                 return StringIO(txt.decode('utf-8'))
 
-    def _convert_csv_2_df(self, csv_string) -> DataFrame:
+    def _convert_csv_2_df(self, csv_string) -> pd.DataFrame:
         """Converts a CSV string to a DataFrame using predefined headers.
 
         Args:
@@ -151,4 +150,4 @@ class ZipLoader():
             DataFrame: A DataFrame created from the CSV string.
         """
         header = load_config("header")
-        return pd.read_csv(csv_string, names=header)
+        return pd.read_csv(csv_string, encoding='utf-8', header=None, names=header, dtype='object')

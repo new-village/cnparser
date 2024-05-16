@@ -19,7 +19,7 @@ class TestLoadFunctions(unittest.TestCase):
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(list(result.columns), self.expected_columns)
         self.assertEqual(len(result), 22427)
-        self.assertEqual(result.iloc[7662]['corporate_number'], 4280001003400)
+        self.assertEqual(result.iloc[7662]['corporate_number'], '4280001003400')
         self.assertEqual(result.iloc[12517]['name'], '株式会社山陰合同銀行')
 
     def test_read_csv(self):
@@ -30,7 +30,7 @@ class TestLoadFunctions(unittest.TestCase):
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(list(result.columns), self.expected_columns)
         self.assertEqual(len(result), 5)
-        self.assertEqual(result.iloc[0]['corporate_number'], 1000013050238)
+        self.assertEqual(result.iloc[0]['corporate_number'], '1000013050238')
         self.assertEqual(result.iloc[1]['name'], '島田商事株式会社')
 
 if __name__ == '__main__':
