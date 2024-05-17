@@ -21,8 +21,8 @@ $ python setup.py install
 This section demonstrates how to use this library to load and process data from the National Tax Agency's [Corporate Number Publication Site](https://www.houjin-bangou.nta.go.jp/).
 
 ### Direct Data Loading
-To load data for a specific prefecture, use the `load` function. By passing the prefecture name as an argument, you can obtain a DataFrame containing data for that prefecture.
-To execute the `load` function without specifying any arguments, data for all prefectures across Japan will be loaded. If you wish to load data for a specific prefecture, you must specify the prefecture name in Roman characters ([list of the supported prefecture](https://github.com/new-village/cnparser/blob/main/cnparser/config/file_id.json)) like below: 
+To download data for a specific prefecture, use the `load` function. By passing the prefecture name as an argument, you can obtain a DataFrame containing data for that prefecture.If you wish to download data for a specific prefecture, you must specify the prefecture name in Roman characters ([list of the supported prefectures](https://github.com/new-village/cnparser/blob/main/cnparser/config/file_id.json)).  
+To execute the `load` function without specifying any arguments, data for all prefectures across Japan will be downloaded. 
 ```
 >>> import cnparser
 >>> df = cnparser.load("Shimane")
@@ -33,6 +33,13 @@ If you already have a downloaded CSV file, use the `read_csv` function. By passi
 ```
 >>> import cnparser
 >>> df = cnparser.read_csv("path/to/data.csv")
+```
+
+### Data Enrichment Functionality
+The `enrich` function adds a standardized furigana column `std_furigana` to the DataFrame. It processes data entry by converting `name` to furigana.
+```
+>>> import cnparser
+>>> df = cnparser.enrich(df)
 ```
 
 ## Tools
