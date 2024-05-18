@@ -1,9 +1,10 @@
-import re
-import pandas as pd
-import unicodedata
-import pykakasi
-import warnings
 import multiprocessing as mp
+import re
+import unicodedata
+import warnings
+
+import pandas as pd
+import pykakasi
 
 from cnparser.utility import load_config
 
@@ -88,12 +89,14 @@ def _normalize_and_convert_kana(text: str) -> str:
 
 def enrich_kind(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Placeholder function for enriching DataFrame with kind data.
+    Maps the 'kind' column of the DataFrame to a standardized legal entity description.
 
     Args:
         df (pd.DataFrame): The DataFrame to be enriched.
 
     Returns:
-        pd.DataFrame: The unchanged DataFrame as no implementation is provided.
+        pd.DataFrame: The DataFrame with the 'std_legal_entity' column added, containing standardized legal entity descriptions.
     """
+    kind = load_config("kind")
+    df['std_legal_entity'] = df['kind'].map(kind)
     return df

@@ -1,9 +1,9 @@
 """ test_enrich.py
 """
-import unittest
 import pandas as pd
+import unittest
+from cnparser.enrich import enrich, enrich_kana, enrich_kind
 from cnparser.load import read_csv
-from cnparser.enrich import enrich, enrich_kana
 
 class TestEnrich(unittest.TestCase):
     def setUp(self):
@@ -18,10 +18,19 @@ class TestEnrich(unittest.TestCase):
         for i, furigana in enumerate(expected_furigana):
             self.assertEqual(result.iloc[i]['std_furigana'], furigana)
 
+    def test_enrich_kind(self):
+        """Test the enrich_kind function to ensure it correctly maps 'kind' to 'std_legal_entity'."""
+        result = enrich_kind(self.df.copy())
+        self.assertIn('std_legal_entity', result.columns)
+        expected_entities = ['National Agency', 'K.K.', 'K.K.', 'K.K.', 'Y.K.']
+        for i, entity in enumerate(expected_entities):
+            self.assertEqual(result.iloc[i]['std_legal_entity'], entity)
+
     def test_enrich_all_processes(self):
         """Test the enrich function with all processes to ensure it processes correctly."""
         result = enrich(self.df.copy())
         self.assertIn('std_furigana', result.columns)
+        self.assertIn('std_legal_entity', result.columns)
 
     def test_enrich_with_invalid_process(self):
         """Test the enrich function with an invalid process name to ensure it returns the original DataFrame unchanged and raises a warning."""
