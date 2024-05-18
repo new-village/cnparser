@@ -49,9 +49,11 @@ The functions perform all processing, but it is possible to apply only specific 
 ```
 
 The processes supported by the `enrich` function are as follows:
-- `enrich_kana`: function adding a standardized furigana column `std_furigana` to the DataFrame. It processes data entry by converting `name` to kana, if `furigana` is NaN. Note that currently only kanji and katakana conversions are supported. Alphabet conversion is not supported.  
-- `enrich_kind`: function adding label of `kind` to `std_legal_entity`.  
-  
+- `enrich_kana`: Function that adds a standardized furigana column `std_furigana` to the DataFrame. It handles data entry by converting `name` to kana, if `furigana` is NaN. Note that currently only kanji and katakana conversions are supported. Alphabet conversions are not supported.  
+- `enrich_kind`: Function that adds the `kind` label to the `std_legal_entity`.  
+- `enrich_post_code`: Function that adds the formatted postcode as XXX-XXX to `std_post_code`.  
+
+
 ## Tools
 ### import_dict.py: Bilingual Emacspeak Project (BEP) Dictionary Import Tool
 This tool imports the [BEP dictionary](https://fastapi.metacpan.org/source/MASH/Lingua-JA-Yomi-0.01/lib/Lingua/JA) and generates a dictionary file for use with cnparser. It processes the bilingual mappings from English to Kana, ensuring that cnparser can accurately handle and transform data involving these language elements.

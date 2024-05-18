@@ -22,6 +22,7 @@ def enrich(df: pd.DataFrame, *processes) -> pd.DataFrame:
     default_functions = {
         'enrich_kana': enrich_kana,
         'enrich_kind': enrich_kind,
+        'enrich_post_code': enrich_post_code,
     }
 
     if processes:
@@ -99,4 +100,17 @@ def enrich_kind(df: pd.DataFrame) -> pd.DataFrame:
     """
     kind = load_config("kind")
     df['std_legal_entity'] = df['kind'].map(kind)
+    return df
+
+def enrich_post_code(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Adds a standardized postal code column to the DataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to be enriched.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the 'std_post_code' column added, where postal codes are formatted as 'XXX-XXX'.
+    """
+    df['std_post_code'] = df['post_code'].apply(lambda x: f"{str(x)[:3]}-{str(x)[3:]}" if pd.notna(x) else None)
     return df
