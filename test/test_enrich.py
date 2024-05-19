@@ -45,8 +45,7 @@ class TestEnrich(unittest.TestCase):
         """Test the enrich function with an invalid process name to ensure it returns the original DataFrame unchanged and raises a warning."""
         with self.assertWarns(Warning) as warning:
             result = enrich(self.df.copy(), 'enrich_error')
-            self.assertEqual(str(warning.warnings[0].message), "No valid processing functions specified in ('enrich_error',). Returning the original DataFrame unchanged.")
-        pd.testing.assert_frame_equal(self.df, result)
+            self.assertEqual(str(warning.warnings[0].message), "No valid function name enrich_error. Skip enrich_error processing.")
 
 if __name__ == '__main__':
     unittest.main()

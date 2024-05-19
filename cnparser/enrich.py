@@ -4,9 +4,16 @@ import unicodedata
 import warnings
 
 import pandas as pd
+from pandarallel import pandarallel
 import pykakasi
 
 from cnparser.utility import load_config
+
+# Initialize libraries
+pandarallel.initialize()
+kks = pykakasi.kakasi()
+legal_entity_regex = re.compile('|'.join(map(re.escape, load_config("legal_entity"))))
+kind = load_config("kind")
 
 def enrich(df: pd.DataFrame, *processes) -> pd.DataFrame:
     """
@@ -19,43 +26,28 @@ def enrich(df: pd.DataFrame, *processes) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The enriched DataFrame.
     """
-    default_functions = {
+    function_map = {
         'enrich_kana': enrich_kana,
         'enrich_kind': enrich_kind,
         'enrich_post_code': enrich_post_code,
     }
 
-    if processes:
-        default_functions = {key: default_functions[key] for key in processes if key in default_functions}
+    valid_processes = []
+    for proc in processes:
+        if proc in function_map:
+            valid_processes.append(proc)
+        else:
+            warnings.warn(f'No valid function name {proc}. Skip {proc} processing.')
 
-    if default_functions:
-        return _parallel_process(df, default_functions)
+    if len(valid_processes) > 0:
+        selected_functions = [function_map[proc] for proc in valid_processes if proc in function_map]
     else:
-        warnings.warn(f"No valid processing functions specified in {processes}. Returning the original DataFrame unchanged.")
-        return df
+        selected_functions = list(function_map.values())
 
-def _parallel_process(df: pd.DataFrame, functions: dict) -> pd.DataFrame:
-    """
-    Processes the DataFrame in parallel using the specified functions.
+    for func in selected_functions:
+        df = func(df)
 
-    Args:
-        df (pd.DataFrame): The DataFrame to be processed.
-        functions (dict): A dictionary of functions to apply to the DataFrame.
-
-    Returns:
-        pd.DataFrame: The DataFrame after processing.
-    """
-    num_processes = mp.cpu_count()
-    pool = mp.Pool(num_processes)
-    df_split = [df.iloc[i::num_processes] for i in range(num_processes)]
-
-    results = []
-    for func_name in list(functions.keys()):
-        result = pd.concat(pool.map(functions[func_name], df_split))
-        results.append(result)
-    pool.close()
-    pool.join()
-    return pd.concat(results)
+    return df
 
 def enrich_kana(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -67,9 +59,8 @@ def enrich_kana(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with the 'std_furigana' column added.
     """
-    df['std_furigana'] = df['name']
-    df.loc[df['furigana'].notna(), 'std_furigana'] = df['furigana']
-    df['std_furigana'] = df['std_furigana'].apply(_normalize_and_convert_kana)
+    df['std_furigana'] = df['furigana'].where(df['furigana'].notna(), df['name'])
+    df['std_furigana'] = df['std_furigana'].parallel_apply(_normalize_and_convert_kana)
     return df
 
 def _normalize_and_convert_kana(text: str) -> str:
@@ -82,11 +73,12 @@ def _normalize_and_convert_kana(text: str) -> str:
     Returns:
         str: The converted text in kana.
     """
-    normalized_text = unicodedata.normalize('NFKC', text)
-    legal_entity_regex = '|'.join(map(re.escape, load_config("legal_entity")))
-    cleaned_text = re.sub(legal_entity_regex, '', normalized_text)
-    kks = pykakasi.kakasi()
-    return "".join(item['kana'] for item in kks.convert(cleaned_text))
+    if re.fullmatch(r"[ァ-ヴー]+", text):
+        return text
+    else:
+        normalized_text = unicodedata.normalize('NFKC', text)
+        cleaned_text = legal_entity_regex.sub('', normalized_text)
+        return "".join(item['kana'] for item in kks.convert(cleaned_text))
 
 def enrich_kind(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -98,7 +90,6 @@ def enrich_kind(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with the 'std_legal_entity' column added, containing standardized legal entity descriptions.
     """
-    kind = load_config("kind")
     df['std_legal_entity'] = df['kind'].map(kind)
     return df
 
@@ -112,5 +103,5 @@ def enrich_post_code(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with the 'std_post_code' column added, where postal codes are formatted as 'XXX-XXX'.
     """
-    df['std_post_code'] = df['post_code'].apply(lambda x: f"{str(x)[:3]}-{str(x)[3:]}" if pd.notna(x) else None)
+    df['std_post_code'] = df['post_code'].parallel_apply(lambda x: f"{str(x)[:3]}-{str(x)[3:]}" if pd.notna(x) else None)
     return df
