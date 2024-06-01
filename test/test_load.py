@@ -18,9 +18,9 @@ class TestLoadFunctions(unittest.TestCase):
         # Validate results
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(list(result.columns), self.expected_columns)
-        self.assertEqual(len(result), 22427)
-        self.assertEqual(result.iloc[7662]['corporate_number'], '4280001003400')
-        self.assertEqual(result.iloc[12517]['name'], '株式会社山陰合同銀行')
+        self.assertEqual(len(result), 22469)
+        self.assertEqual(result.iloc[7662]['corporate_number'], '4280001003202')
+        self.assertEqual(result.iloc[12517]['name'], 'グローバス株式会社')
 
     def test_read_csv(self):
         """Test the read_csv function with a specific CSV file."""
