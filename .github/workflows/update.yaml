@@ -25,10 +25,10 @@ jobs:
       
       - name: Run update_fileid.py
         run: python tools/update_fileid.py
-      
+
       - name: Patch version in setup.py
         run: |
-          sed -i 's/\(version=\)'\''[0-9]\+\.[0-9]\+\.[0-9]\+'\''/\1'\''$(python -c "import re; version = re.search(r'version=\''([0-9]+\.[0-9]+\.[0-9]+)\'', open('setup.py').read()); major, minor, patch = version.group(1).split('.'); patch = int(patch) + 1; new_version = f'{major}.{minor}.{patch}'; print(new_version)")'\''/' setup.py
+          sed -i "s/\(version=\)'\([0-9]\+\.[0-9]\+\.[0-9]\+\)'/\1'$(python -c \"import re; version = re.search(r'version='([0-9]+\.[0-9]+\.[0-9]+)', open('setup.py').read()); major, minor, patch = version.group(1).split('.'); patch = int(patch) + 1; new_version = f'{major}.{minor}.{patch}'; print(new_version)\")'/" setup.py
 
       - name: Commit changes
         run: |
