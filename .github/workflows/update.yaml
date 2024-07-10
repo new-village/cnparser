@@ -28,7 +28,14 @@ jobs:
 
       - name: Patch version in setup.py
         run: |
-          sed -i "s/\(version=\)'\([0-9]\+\.[0-9]\+\.[0-9]\+\)'/\1'$(python -c \"import re; version = re.search(r'version='([0-9]+\.[0-9]+\.[0-9]+)', open('setup.py').read()); major, minor, patch = version.group(1).split('.'); patch = int(patch) + 1; new_version = f'{major}.{minor}.{patch}'; print(new_version)\")'/" setup.py
+          python -c "import re; \
+          content = open('setup.py').read(); \
+          version = re.search(r\"version='([0-9]+\.[0-9]+\.[0-9]+)'\", content); \
+          major, minor, patch = version.group(1).split('.'); \
+          patch = str(int(patch) + 1); \
+          new_version = f\"version='{major}.{minor}.{patch}'\"; \
+          updated_content = re.sub(r\"version='[0-9]+\.[0-9]+\.[0-9]+'\", new_version, content); \
+          open('setup.py', 'w').write(updated_content)"
 
       - name: Commit changes
         run: |
