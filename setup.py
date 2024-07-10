@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name='cnparser',
-    version='1.5.7',
+    version='$(python -c "import re; version = re.search(rversion='([0-9]+.[0-9]+.[0-9]+), open(setup.py).read()); major, minor, patch = version.group(1).split(.); patch = int(patch) + 1; new_version = f{major}.{minor}.{patch}; print(new_version)")',
     author='new-village',
     url='https://github.com/new-village/cnparser',
     description='cnparser is a parser library of Corporate Number Publication Site data.',
