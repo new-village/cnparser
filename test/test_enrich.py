@@ -22,7 +22,7 @@ class TestEnrich(unittest.TestCase):
         """Test the enrich_kind function to ensure it correctly maps 'kind' to 'std_legal_entity'."""
         result = enrich_kind(self.df.copy())
         self.assertIn('std_legal_entity', result.columns)
-        expected_entities = ['National Agency', 'K.K.', 'K.K.', 'K.K.', 'Y.K.']
+        expected_entities = ['国の機関', '株式会社', '株式会社', '株式会社', '有限会社']
         for i, entity in enumerate(expected_entities):
             self.assertEqual(result.iloc[i]['std_legal_entity'], entity)
 
