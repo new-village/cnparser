@@ -104,7 +104,7 @@ def enrich_kind(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with the 'std_legal_entity' column added, containing standardized legal entity descriptions.
     """
-    df['std_legal_entity'] = df['kind'].map(kind)
+    df['legal_entity'] = df['kind'].map(kind)
     return df
 
 def enrich_post_code(df: pd.DataFrame) -> pd.DataFrame:

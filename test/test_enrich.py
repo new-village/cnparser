@@ -33,10 +33,10 @@ class TestEnrich(unittest.TestCase):
     def test_enrich_kind(self):
         """Test the enrich_kind function to ensure it correctly maps 'kind' to 'std_legal_entity'."""
         result = enrich_kind(self.df.copy())
-        self.assertIn('std_legal_entity', result.columns)
+        self.assertIn('legal_entity', result.columns)
         expected_entities = ['国の機関', '株式会社', '株式会社', '株式会社', '有限会社']
         for i, entity in enumerate(expected_entities):
-            self.assertEqual(result.iloc[i]['std_legal_entity'], entity)
+            self.assertEqual(result.iloc[i]['legal_entity'], entity)
 
     def test_enrich_postcode(self):
         """Test the enrich_kind function to ensure it correctly maps 'kind' to 'std_legal_entity'."""
@@ -50,7 +50,7 @@ class TestEnrich(unittest.TestCase):
         """Test the enrich function with all processes to ensure it processes correctly."""
         result = enrich(self.df.copy())
         self.assertIn('furigana', result.columns)
-        self.assertIn('std_legal_entity', result.columns)
+        self.assertIn('legal_entity', result.columns)
         self.assertIn('std_post_code', result.columns)
 
     def test_enrich_with_invalid_process(self):
