@@ -74,8 +74,8 @@ def enrich_kana(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with the 'std_furigana' column added.
     """
-    df['std_furigana'] = df['furigana'].where(df['furigana'].notna(), df['name'])
-    df['std_furigana'] = df['std_furigana'].parallel_apply(_normalize_and_convert_kana)
+    df['furigana'] = df['furigana'].where(df['furigana'].notna(), df['name'])
+    df['furigana'] = df['furigana'].parallel_apply(_normalize_and_convert_kana)
     return df
 
 def _normalize_and_convert_kana(text: str) -> str:

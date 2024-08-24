@@ -8,27 +8,27 @@ from cnparser.load import read_csv
 class TestEnrich(unittest.TestCase):
     def setUp(self):
         """Set up the test environment by loading test data from a CSV file."""
-        self.df = read_csv('./test/data/31_tottori_test_20240329.csv')
+        test_data = read_csv('./test/data/31_tottori_test_20240329.csv')
+        self.df = standardization(test_data)
 
     def test_standardization(self):
         """Test the standardization function to ensure it correctly standardizes the data."""
-        result = standardization(self.df.copy())
 
         expected_name = ['鳥取簡易裁判所', '島田商事株式会社', '株式会社souvenir', '株式会社T&Mコンサルティング', '有限会社HAP観光']
         for i, val in enumerate(expected_name):
-            self.assertEqual(result.iloc[i]['name'], val)
+            self.assertEqual(self.df.iloc[i]['name'], val)
 
         expected_street = ['東町2丁目223', '安来町1578番地', '安来町1193番地', '東出雲町揖屋843番地', '天神町70番地12']
         for i, val in enumerate(expected_street):
-            self.assertEqual(result.iloc[i]['street_number'], val)
+            self.assertEqual(self.df.iloc[i]['street_number'], val)
 
     def test_enrich_kana(self):
         """Test the enrich_kana function to ensure it correctly adds the 'std_furigana' column."""
         result = enrich_kana(self.df.copy())
-        self.assertIn('std_furigana', result.columns)
+        self.assertIn('furigana', result.columns)
         expected_furigana = ['トットリカンイサイバンショ', 'シマダショウジ', 'souvenir', 'T&Mコンサルティング', 'HAPカンコウ']
         for i, furigana in enumerate(expected_furigana):
-            self.assertEqual(result.iloc[i]['std_furigana'], furigana)
+            self.assertEqual(result.iloc[i]['furigana'], furigana)
 
     def test_enrich_kind(self):
         """Test the enrich_kind function to ensure it correctly maps 'kind' to 'std_legal_entity'."""
@@ -49,7 +49,7 @@ class TestEnrich(unittest.TestCase):
     def test_enrich_all_processes(self):
         """Test the enrich function with all processes to ensure it processes correctly."""
         result = enrich(self.df.copy())
-        self.assertIn('std_furigana', result.columns)
+        self.assertIn('furigana', result.columns)
         self.assertIn('std_legal_entity', result.columns)
         self.assertIn('std_post_code', result.columns)
 
