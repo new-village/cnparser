@@ -51,6 +51,6 @@ The functions perform all processing, but it is possible to apply only specific 
 ```
 
 The processes supported by the `enrich` function are as follows:
-- `enrich_kana`: Function that adds a standardized furigana column `std_furigana` to the DataFrame. It handles data entry by converting `name` to kana, if `furigana` is NaN. Note that currently only kanji and katakana conversions are supported. Alphabet conversions are not supported.  
-- `enrich_kind`: Function that adds the `kind` label to the `std_legal_entity`.  
-- `enrich_post_code`: Function that adds the formatted postcode as XXX-XXX to `std_post_code`.  
+- `enrich_kana`: Function that adds a standardized furigana column `furigana` to the DataFrame. It handles data entry by converting `name` to kana, if `furigana` is NaN. Note that currently only kanji and katakana conversions are supported. Alphabet conversions are not supported.  
+- `enrich_kind`: Function that adds the `kind` label to the `legal_entity`.  
+- `enrich_post_code`: Function that adds the formatted postcode as XXX-XXX to `post_code`.  

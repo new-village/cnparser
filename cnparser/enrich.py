@@ -117,7 +117,7 @@ def enrich_post_code(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The DataFrame with the 'std_post_code' column added, where postal codes are formatted as 'XXX-XXX'.
     """
-    df['std_post_code'] = df['post_code'].parallel_apply(lambda x: f"{str(x)[:3]}-{str(x)[3:]}" if pd.notna(x) else None)
+    df['post_code'] = df['post_code'].parallel_apply(lambda x: f"{str(x)[:3]}-{str(x)[3:]}" if pd.notna(x) else None)
     return df
 
 def _convert_to_half_width(text: str) -> str:
