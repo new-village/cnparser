@@ -2,13 +2,25 @@
 """
 import pandas as pd
 import unittest
-from cnparser.enrich import enrich, enrich_kana, enrich_kind, enrich_post_code
+from cnparser.enrich import enrich, standardization, enrich_kana, enrich_kind, enrich_post_code
 from cnparser.load import read_csv
 
 class TestEnrich(unittest.TestCase):
     def setUp(self):
         """Set up the test environment by loading test data from a CSV file."""
         self.df = read_csv('./test/data/31_tottori_test_20240329.csv')
+
+    def test_standardization(self):
+        """Test the standardization function to ensure it correctly standardizes the data."""
+        result = standardization(self.df.copy())
+
+        expected_name = ['鳥取簡易裁判所', '島田商事株式会社', '株式会社souvenir', '株式会社T&Mコンサルティング', '有限会社HAP観光']
+        for i, val in enumerate(expected_name):
+            self.assertEqual(result.iloc[i]['name'], val)
+
+        expected_street = ['東町2丁目223', '安来町1578番地', '安来町1193番地', '東出雲町揖屋843番地', '天神町70番地12']
+        for i, val in enumerate(expected_street):
+            self.assertEqual(result.iloc[i]['street_number'], val)
 
     def test_enrich_kana(self):
         """Test the enrich_kana function to ensure it correctly adds the 'std_furigana' column."""
