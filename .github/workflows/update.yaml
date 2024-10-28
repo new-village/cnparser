@@ -46,6 +46,3 @@ jobs:
                   
       - name: Push repository
         run: git push
-
-      - name: Call deploy workflow
-        uses: ../.github/workflows/deploy.yaml

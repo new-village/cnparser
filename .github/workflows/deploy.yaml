@@ -1,9 +1,10 @@
-name: Deploy to PyPI using Trusted Publishers
+name: Deploy to PyPI
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Test", "Monthly Update FileID"]
+    types:
+      - completed
 
 jobs:
   build-and-deploy:
